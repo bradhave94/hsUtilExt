@@ -30,7 +30,9 @@ export function Options() {
         hubId: accountInfo.portalId,
         name: accountInfo.accountName,
         accessToken: authResult.access_token,
-        refreshToken: authResult.refresh_token  // Make sure this exists
+        refreshToken: authResult.refresh_token,  // Make sure this exists
+        tokenType: authResult.token_type || 'bearer',
+        expiresAt: Date.now() + (authResult.expires_in * 1000)
       }
 
       console.log('New Account to be saved:', newAccount)  // Debug log

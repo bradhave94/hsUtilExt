@@ -44,7 +44,9 @@ if (window.location.href.startsWith('https://app.hubspot.com/design-manager/')) 
                         account: {
                             hubId: account.hubId,
                             accessToken: account.accessToken,
-                            refreshToken: account.refreshToken
+                            refreshToken: account.refreshToken,
+                            expiresAt: account.expiresAt,  // Add this
+                            tokenType: account.tokenType    // Add this
                         }
                     });
                     
