@@ -1,61 +1,34 @@
 const CLIENT_ID = 'd265053b-d8ee-47d1-b4b8-b14ac07b00cd'
 const CLIENT_SECRET = null
 const REDIRECT_URI = chrome.identity.getRedirectURL()
-console.log('Redirect URIs:', REDIRECT_URI)  // Add this line to check the actual value
 
 export const initiateHubSpotAuth = async () => {
-  const state = crypto.randomUUID()
-  
-  // Log the REDIRECT_URI separately
-  console.log('REDIRECT_URI:', REDIRECT_URI)
-  
-  const scopes = [
-    'oauth',
-    'content'
-  ].join(' ')
-  
-  const authUrl = 'https://app.hubspot.com/oauth/authorize?' +
-    `client_id=${encodeURIComponent(CLIENT_ID)}&` +
-    `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
-    `scope=${encodeURIComponent(scopes)}&` +
-    `state=${encodeURIComponent(state)}&` +
-    'response_type=code'
+    const authUrl = `https://app.hubspot.com/oauth/authorize` + 
+        `?client_id=${CLIENT_ID}` +
+        `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+        `&scope=contacts%20oauth`;  // Add your required scopes
 
-  // Log the complete auth URL
-  console.log('Complete Auth URL:', authUrl)
+    try {
+        // This handles the entire OAuth flow securely
+        const responseUrl = await chrome.identity.launchWebAuthFlow({
+            url: authUrl,
+            interactive: true
+        });
+        
+        // Extract the code from the response URL
+        const url = new URL(responseUrl);
+        const code = url.searchParams.get('code');
+        
+        if (!code) {
+            throw new Error('No code received');
+        }
 
-  try {
-    console.log('Starting auth flow...')
-    const redirectUrl = await chrome.identity.launchWebAuthFlow({
-      url: authUrl,
-      interactive: true
-    })
-    console.log('Received redirect URL:', redirectUrl)
-
-    if (!redirectUrl) {
-      throw new Error('Authentication was cancelled')
+        // Exchange the code for tokens
+        return exchangeCodeForToken(code);
+    } catch (error) {
+        console.error('Auth error:', error);
+        throw error;
     }
-
-    const params = new URL(redirectUrl).searchParams
-    const code = params.get('code')
-    const returnedState = params.get('state')
-
-    if (returnedState !== state) {
-      throw new Error('State mismatch - possible CSRF attack')
-    }
-
-    if (!code) {
-      throw new Error('No authorization code received')
-    }
-    
-    return await exchangeCodeForToken(code)
-  } catch (error) {
-    if (error.message === 'The user did not approve access.') {
-      throw new Error('Authentication was cancelled by the user')
-    }
-    console.error('Auth flow failed:', error)
-    throw error
-  }
 }
 
 export const exchangeCodeForToken = async (code) => {
@@ -78,12 +51,12 @@ export const exchangeCodeForToken = async (code) => {
 }
 
 export const getAccountInfo = async (accessToken) => {
-  const response = await fetch('https://api.hubapi.com/account-info/v3/details', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
-  })
-  return response.json()
+    const response = await fetch('https://api.hubapi.com/account-info/v3/details', {
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }
+    })
+    return response.json()
 }
 
 export const refreshAccessToken = async (refreshToken) => {

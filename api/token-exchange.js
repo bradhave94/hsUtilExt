@@ -2,7 +2,7 @@ import fetch from 'node-fetch';
 
 export default async function handler(req, res) {
   // List of valid extension IDs (from Chrome Web Store)
-  const VALID_EXTENSION_IDS = ['your-extension-id-1', 'your-extension-id-2'];
+  const VALID_EXTENSION_IDS = ['fkbgjaiehfdibpidjgfnncomhbobipfo', 'your-extension-id-2'];
   
   const extensionId = req.headers['x-extension-id'];
   
