@@ -1,13 +1,25 @@
 import fetch from 'node-fetch';
 
+// At the top of your file
+const ALLOWED_EXTENSION_ID = process.env.ALLOWED_EXTENSION_ID;
+
 export default async function handler(req, res) {
-  // List of valid extension IDs (from Chrome Web Store)
-  const VALID_EXTENSION_IDS = ['fkbgjaiehfdibpidjgfnncomhbobipfo', 'your-extension-id-2'];
-  
+  // Add CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', `chrome-extension://${ALLOWED_EXTENSION_ID}`);
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Extension-Id, Content-Type');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  // After setting CORS headers
   const extensionId = req.headers['x-extension-id'];
   
-  if (!VALID_EXTENSION_IDS.includes(extensionId)) {
-    return res.status(401).json({ error: 'Unauthorized' });
+  if (extensionId !== ALLOWED_EXTENSION_ID) {
+    return res.status(401).json({ error: 'Unauthorized extension' });
   }
 
   if (req.method !== 'POST') {
@@ -32,6 +44,12 @@ export default async function handler(req, res) {
     });
 
     const data = await response.json();
+    
+    if (!response.ok) {
+      console.error('HubSpot API error:', data);
+      return res.status(response.status).json(data);
+    }
+
     return res.status(200).json(data);
   } catch (error) {
     console.error('Token exchange error:', error);

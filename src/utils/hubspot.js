@@ -1,12 +1,13 @@
 const CLIENT_ID = 'd265053b-d8ee-47d1-b4b8-b14ac07b00cd'
 const CLIENT_SECRET = null
 const REDIRECT_URI = chrome.identity.getRedirectURL()
+const VERCEL_API_URL = 'https://hs-util-ext.vercel.app/api/token-exchange';
 
 export const initiateHubSpotAuth = async () => {
     const authUrl = `https://app.hubspot.com/oauth/authorize` + 
         `?client_id=${CLIENT_ID}` +
         `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-        `&scope=contacts%20oauth`;  // Add your required scopes
+        `&scope=content%20oauth`;  // Add your required scopes
 
     try {
         // This handles the entire OAuth flow securely
@@ -32,22 +33,39 @@ export const initiateHubSpotAuth = async () => {
 }
 
 export const exchangeCodeForToken = async (code) => {
-    const response = await fetch('https://your-vercel-app.vercel.app/api/token-exchange', {
-        method: 'POST',
-        headers: {
-            'X-Extension-Id': chrome.runtime.id,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code })
-    });
+    try {
+        const response = await fetch(VERCEL_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Extension-Id': chrome.runtime.id
+            },
+            body: JSON.stringify({ 
+                code,
+                redirect_uri: chrome.identity.getRedirectURL()
+            })
+        });
 
-    if (!response.ok) {
-        const errorData = await response.text();
-        console.error('Token exchange failed:', errorData);
-        throw new Error(`Token exchange failed: ${response.status}`);
+        if (!response.ok) {
+            const errorData = await response.text();
+            console.error('Token exchange failed:', errorData);
+            throw new Error(`Token exchange failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Token exchange response:', data);  // Debug log
+        
+        // Make sure we have both tokens
+        if (!data.access_token || !data.refresh_token) {
+            console.error('Missing required tokens in response:', data);
+            throw new Error('Incomplete token data received');
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('Error in exchangeCodeForToken:', error);
+        throw error;
     }
-
-    return response.json();
 }
 
 export const getAccountInfo = async (accessToken) => {
