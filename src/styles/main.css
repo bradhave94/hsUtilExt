@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  --color-hubspot: #ff7a59;
+  --color-hubspot-hover: #ff8f73;
+  
+  /* Custom spacing for the extension */
+  --spacing-popup: 320px;
+  --spacing-popup-height: 400px;
+}
+
+/* Custom base styles */
+@layer base {
+  body {
+    min-width: var(--spacing-popup);
+    min-height: var(--spacing-popup-height);
+  }
+}

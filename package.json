@@ -1,0 +1,26 @@
+{
+  "name": "hsutilext",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "watch": "vite build --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "next",
+    "@tailwindcss/vite": "^4.0.0-alpha.29",
+    "@vitejs/plugin-react": "^4.3.3",
+    "tailwindcss": "^4.0.0-alpha.29",
+    "vite": "^5.4.10",
+    "vite-plugin-static-copy": "^2.0.0"
+  }
+}
