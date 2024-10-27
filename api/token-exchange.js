@@ -15,12 +15,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { code, extensionAuth } = req.body;
-
-    // Verify request is from your extension
-    if (extensionAuth !== process.env.EXTENSION_AUTH_SECRET) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
+    const { code } = req.body;
 
     const response = await fetch('https://api.hubapi.com/oauth/v1/token', {
       method: 'POST',

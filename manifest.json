@@ -9,7 +9,8 @@
     "identity",
     "alarms",
     "webNavigation",
-    "tabs"
+    "tabs",
+    "management"
   ],
   "host_permissions": [
     "https://app.hubspot.com/*",
