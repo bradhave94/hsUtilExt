@@ -7,10 +7,9 @@ export const saveAccounts = async (accounts) => {
   await chrome.storage.sync.set({ hubspotAccounts: accounts })
 }
 
-export const removeAccount = async (accountId) => {
+export const removeAccount = async (hubId) => {
   const accounts = await getAccounts()
-  const updatedAccounts = accounts.filter(account => account.id !== accountId)
+  const updatedAccounts = accounts.filter(account => account.hubId !== hubId)
   await saveAccounts(updatedAccounts)
   return updatedAccounts
 }
-

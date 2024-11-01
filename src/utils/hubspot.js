@@ -1,38 +1,55 @@
 const CLIENT_ID = 'd265053b-d8ee-47d1-b4b8-b14ac07b00cd'
 const REDIRECT_URI = chrome.identity.getRedirectURL()
 
-// Define API URLs based on environment
-const API_URL = process.env.NODE_ENV === 'development' 
-    ? 'http://localhost:3000/api'  // Remove trailing slash
-    : 'https://hs-util-ext.vercel.app/api';
+const API_URL = 'http://localhost:3000/api';  // Development
+// const API_URL = 'https://hs-util-ext.vercel.app/api';  // Production
 
 console.log('Using API URL:', API_URL); // Debug log
 
 export const initiateHubSpotAuth = async () => {
-    const authUrl = `https://app.hubspot.com/oauth/authorize` + 
-        `?client_id=${CLIENT_ID}` +
-        `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
-        `&scope=content%20oauth`;
-
-    try {
+    const getAuthCode = async (url) => {
         const responseUrl = await chrome.identity.launchWebAuthFlow({
-            url: authUrl,
+            url,
             interactive: true
         });
         
-        const url = new URL(responseUrl);
-        const code = url.searchParams.get('code');
-        
+        const code = new URL(responseUrl).searchParams.get('code');
         if (!code) {
-            throw new Error('No code received');
+            throw new Error('No authorization code received');
         }
+        return code;
+    };
 
+    try {
+        // Try standard OAuth flow first
+        const authUrl = `https://app.hubspot.com/oauth/authorize` +
+            `?client_id=${CLIENT_ID}` +
+            `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+            `&scope=content%20oauth`;
+
+        const code = await getAuthCode(authUrl);
         return exchangeCodeForToken(code);
     } catch (error) {
-        console.error('Auth error:', error);
-        throw error;
+        // Handle user cancellation explicitly
+        if (error.message.includes('The user did not approve access')) {
+            throw new Error('Authentication cancelled by user');
+        }
+
+        // Fall back to oauth-bridge for other errors
+        try {
+            const bridgeUrl = `https://app.hubspot.com/oauth-bridge` +
+                `?client_id=${CLIENT_ID}` +
+                `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +
+                `&scope=content%20oauth`;
+
+            const code = await getAuthCode(bridgeUrl);
+            return exchangeCodeForToken(code);
+        } catch (bridgeError) {
+            console.error('Both authentication methods failed:', bridgeError);
+            throw new Error('Authentication failed. Please try again.');
+        }
     }
-}
+};
 
 export const exchangeCodeForToken = async (code) => {
     try {
@@ -167,6 +184,7 @@ export const getModuleInfo = async (moduleId, account) => {
     
     const response = await fetch(`${API_URL}/module-info`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json',
             'X-Extension-Id': chrome.runtime.id

@@ -47,8 +47,8 @@ export function Options() {
     }
   }
 
-  const handleRemoveAccount = async (accountId) => {
-    const updatedAccounts = accounts.filter(account => account.id !== accountId)
+  const handleRemoveAccount = async (hubId) => {
+    const updatedAccounts = accounts.filter(account => account.hubId !== hubId)
     await saveAccounts(updatedAccounts)
     setAccounts(updatedAccounts)
   }

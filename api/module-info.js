@@ -1,4 +1,4 @@
-import { getModuleInfo } from './hubspot-service';
+import { getModuleInfo } from './hubspot-service.js';
 import { corsMiddleware } from './middleware/auth.js';
 
 async function handler(req, res) {
