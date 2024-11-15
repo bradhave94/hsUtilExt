@@ -13,7 +13,7 @@
         "dev:api": "cd api && npm run dev",
         "build:ext": "cd extension && npm run build",
         "build:web": "cd website && npm run build",
-        "build": "npm run build:ext && npm run build:web"
+        "build": "npm run build:ext"
     },
     "dependencies": {
         "vite": "^5.4.10"
