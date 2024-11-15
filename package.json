@@ -1,27 +1,21 @@
 {
-  "name": "hs-util-ext",
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "watch": "vite build --watch"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "node-fetch": "^3.3.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "next",
-    "@tailwindcss/vite": "^4.0.0-alpha.29",
-    "@vitejs/plugin-react": "^4.3.3",
-    "tailwindcss": "^4.0.0-alpha.29",
-    "vite": "^5.4.10",
-    "vite-plugin-static-copy": "^2.0.0"
-  }
+    "name": "hs-util-ext-monorepo",
+    "type": "module",
+    "private": true,
+    "workspaces": [
+        "extension",
+        "website",
+        "api"
+    ],
+    "scripts": {
+        "dev:ext": "cd extension && npm run dev",
+        "dev:web": "cd website && npm run dev",
+        "dev:api": "cd api && npm run dev",
+        "build:ext": "cd extension && npm run build",
+        "build:web": "cd website && npm run build",
+        "build": "npm run build:ext && npm run build:web"
+    },
+    "dependencies": {
+        "vite": "^5.4.10"
+    }
 }
