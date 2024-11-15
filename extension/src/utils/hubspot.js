@@ -1,8 +1,8 @@
 const CLIENT_ID = 'd265053b-d8ee-47d1-b4b8-b14ac07b00cd'
 const REDIRECT_URI = chrome.identity.getRedirectURL()
 
-const API_URL = 'http://localhost:3000/api';  // Development
-// const API_URL = 'https://hs-util-ext.vercel.app/api';  // Production
+// const API_URL = 'http://localhost:3000/api';  // Development
+const API_URL = 'https://hs-util-ext.vercel.app/api';  // Production
 
 console.log('Using API URL:', API_URL); // Debug log
 
