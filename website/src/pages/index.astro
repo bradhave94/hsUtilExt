@@ -1,22 +1,8 @@
 ---
+import { Welcome } from 'astro:components';
 import Layout from '../layouts/Layout.astro';
-import { getAuthUrl } from '../lib/hubspot/api';
-
-const authUrl = getAuthUrl();
-const isAuthenticated = true
 ---
-<Layout title="HubSpot OAuth">
-	<main class="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
-		<h1 class="text-4xl font-bold mb-6 text-orange-500">HubSpot Utils</h1>
-		<div class="space-y-4">
-			<a href={authUrl} class="block w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
-				{isAuthenticated ? 'Change Portal' : 'Authenticate with HubSpot'}
-			</a>
-			{isAuthenticated && (
-				<a href="/pages" class="block w-full text-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
-					View Pages
-				</a>
-			)}
-		</div>
-	</main>
+
+<Layout>
+	<Welcome title="Welcome to Astro" />
 </Layout>
