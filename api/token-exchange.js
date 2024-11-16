@@ -2,6 +2,10 @@ import fetch from 'node-fetch';
 import { corsMiddleware } from './middleware/auth.js';
 
 async function handler(req, res) {
+    if (req.method === 'GET') {
+        return res.status(200).json({ message: 'GET method is not supported.' });
+    }
+
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
